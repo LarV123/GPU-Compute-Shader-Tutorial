@@ -1,0 +1,31 @@
+﻿#pragma kernel Simulate
+
+struct Particle {
+    float2 position;
+    float2 velocity;
+    float radius;
+};
+
+RWStructuredBuffer<Particle> particles;
+int particleCount;
+float deltaTime;
+
+[numthreads(64, 1, 1)]
+void Simulate(uint3 id : SV_DispatchThreadID) {
+    if (id.x >= particleCount) {
+        return;
+    }
+    particles[id.x].position = particles[id.x].position + particles[id.x].velocity * deltaTime;
+    if (particles[id.x].position.x + particles[id.x].radius > 5 && particles[id.x].velocity.x > 0) {
+        particles[id.x].velocity.x = -particles[id.x].velocity.x;
+    }
+    if (particles[id.x].position.x - particles[id.x].radius < -5 && particles[id.x].velocity.x < 0) {
+        particles[id.x].velocity.x = -particles[id.x].velocity.x;
+    }
+    if (particles[id.x].position.y + particles[id.x].radius > 5 && particles[id.x].velocity.y > 0) {
+        particles[id.x].velocity.y = -particles[id.x].velocity.y;
+    }
+    if (particles[id.x].position.y - particles[id.x].radius < -5 && particles[id.x].velocity.y < 0) {
+        particles[id.x].velocity.y = -particles[id.x].velocity.y;
+    }
+}
